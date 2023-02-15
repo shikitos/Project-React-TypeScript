@@ -1,11 +1,13 @@
 import React from 'react';
+import { SpaceCanvas } from '../../components';
 
 function Home() {
     return (
-      <div>
-        <h1>Welcome to the Home page!</h1>
-        <p>This is the content of the Home page.</p>
-      </div>
+        <div
+            style={{height: '100vh', width: '100%'}}
+        >
+            <SpaceCanvas />
+        </div>
     );
 }
   
