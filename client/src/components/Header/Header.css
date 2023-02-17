@@ -1,0 +1,40 @@
+header.header {
+    padding: 25px 0;
+}
+
+header.header > div  {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-logo {
+    cursor: pointer;
+}
+
+.header-nav > nav > ul {
+    list-style: none;
+    display: flex;
+    gap: 25px
+}
+
+.header-nav__li {
+    transition: 0.5s all ease;
+    cursor: pointer;
+    position: relative;
+}
+
+.header-nav__li:hover:after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 2px;
+    background-color: red;
+    transition: height 0.3s;
+}
+
+.header-auth > button {
+    cursor: pointer;
+}
