@@ -1,0 +1,38 @@
+.video-container {
+    position: relative;
+    width: 100%;
+    height: 0;
+    padding-bottom: 56.25%;
+}
+/* 
+.video-container:after {
+    position: absolute;
+    content:"";
+    top:0;
+    left:0;
+    bottom:0;
+    right:0;
+    background: url('../../../public/images/background_sky.png') no-repeat bottom center / contain;
+    z-index: 5;
+} */
+
+
+div.overlay {
+    position: absolute;
+    top: 45%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #fff;
+    z-index: 1;
+}
+
+div.overlay h1 {
+    text-align: center;
+    font-size: 5rem;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.overlay strong {
+    font-size: 1em;
+}

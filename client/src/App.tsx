@@ -1,6 +1,5 @@
-import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { Home } from './pages/';
+import { Home, Auth } from './pages/';
 import { Header, Footer } from './components';
 
 function App() {
@@ -9,6 +8,7 @@ function App() {
             <Header />
                 <Routes>
                     <Route path="/" element={<Home />} />
+                    <Route path="/sign-in" element={<Auth />} />
                 </Routes>
             <Footer />
         </BrowserRouter>
