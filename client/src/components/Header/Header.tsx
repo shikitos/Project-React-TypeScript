@@ -1,20 +1,38 @@
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ReactComponent as LogoSVG } from '../../utils/svg/logo.svg';
+import { ReactComponent as NightSVG } from '../../utils/svg/nightmode-night.svg';
+import { ReactComponent as DaySVG } from '../../utils/svg/nightmode-day.svg';
 import './Header.css';
+import React, {useEffect, useState} from "react";
 
 
-type Props = {}
+type Props = {};
 
 const Header = (props: Props) => {
     const navigate = useNavigate();
     const location = useLocation();
-    console.log(location);
+    const [nightmode, setNightMode] = useState<boolean>(true);
+
+    useEffect(() => {
+        if (nightmode) {
+            document.body.classList.add('nightmode');
+        } else {
+            document.body.classList.remove('nightmode');
+        }
+    }, [nightmode]);
+
+    const toggleNightMode = (event: React.MouseEvent) => {
+        console.log(`Toggle to ${nightmode ? 'Day mode' : 'Night mode'}`);
+        setNightMode(prev => !prev);
+    }
 
     return (
         <header 
-            className='header'
+            className={
+                location.pathname !== '/' ? "header" : 'header home'
+            }
             style={{ 
-                backgroundColor: location.pathname !== '/' ? "var(--color-sky-blue)" : 'transparent' 
+                position: location.pathname !== '/' ? "initial" : "fixed"
             }}
         >
             <div className='container'>
@@ -56,7 +74,19 @@ const Header = (props: Props) => {
                 <div className='header-auth'>
                     <button
                         onClick={() => navigate('/sign-in')}
-                    >Sign In / Sign Up</button>
+                    >
+                        Sign In / Sign Up
+                    </button>
+                    <span
+                        onClick={(event) => toggleNightMode(event)}
+                        className={ nightmode ? 'nightmode' : 'daymode' }
+                    >
+                        {
+                            nightmode ?
+                            <DaySVG /> :
+                            <NightSVG />
+                        }
+                    </span>
                 </div>
             </div>
         </header>

@@ -5,6 +5,13 @@ header.header {
     left: 0;
     z-index: 99;
     width: 100%;
+    background: var(--color-black);
+    color: var(--color-white)
+}
+
+header.header.home {
+    background: transparent;
+    color: var(--color-white);
 }
 
 header.header > div  {
@@ -25,9 +32,16 @@ header.header > div  {
 }
 
 .header-nav__li {
-    transition: 0.5s all ease;
     cursor: pointer;
     position: relative;
+}
+
+.header-nav > nav > ul:hover {
+    opacity: 0.25;
+}
+
+.header-nav__li:hover {
+    opacity: 1;
 }
 
 .header-nav__li:hover:after {
@@ -38,20 +52,32 @@ header.header > div  {
     width: 100%;
     height: 2px;
     background-color: var(--color-white);
-    transition: height 0.3s;
+}
+
+.header-auth {
+    display: flex;
+    gap: 25px;
+    align-items: center;
 }
 
 .header-auth > button {
-    cursor: pointer;
-    border: 1px solid var(--color-white);
-    font-weight: 500;
-    /* border-radius: 10px; */
-    padding: 7.5px 10px;
     background: transparent;
     color: var(--color-white);
+    border: 1px solid var(--color-white);
 }
 
 .header-auth > button:hover {
-    color: var(--color-sky-blue);
     background: var(--color-white);
+    color: var(--color-black);
 }
+
+.header-auth > span {
+    cursor: pointer;
+    font-size: 24px;
+}
+
+.header-auth > span > svg:hover {
+    fill: var(--color-black);
+    stroke: var(--color-black);
+}
+

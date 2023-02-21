@@ -1,10 +1,110 @@
 *, body {
-    color: var(--color-white);
-    background: var(--color-sky-blue);
     font-family: var(--main-font);
     font-size: 18px;
     font-weight: 400;
     line-height: 1.5;
-    transition: 0.25s all linear;
     background: transparent;
+}
+
+#root {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    transition: 0.25s all linear;
+}
+
+body {
+    background: var(--color-white);
+    color: var(--color-black);
+}
+
+body.nightmode {
+    background: var(--color-black);
+    color: var(--color-white);
+}
+
+button,
+input[type="submit"] {
+    cursor: pointer;
+    font-weight: 500;
+    padding: 8px 10px;
+    background: transparent;
+}
+
+
+body button,
+body input[type="submit"] {
+    border: 1px solid var(--color-black);
+    color: var(--color-black);
+}
+
+body.nightmode button,
+body.nightmode input[type="submit"] {
+    border: 1px solid var(--color-white);
+    color: var(--color-white);
+}
+
+body button:hover,
+body input[type="submit"]:hover {
+    color: var(--color-white);
+    background: var(--color-black);
+}
+
+body.nightmode button:hover,
+body.nightmode input[type="submit"]:hover {
+    color: var(--color-black);
+    background: var(--color-white);
+}
+
+body input[type="email"],
+body input[type="password"],
+body input[type="text"] {
+    border: 1px solid var(--color-black);
+    color: var(--color-black);
+}
+
+body.nightmode input[type="email"],
+body.nightmode input[type="password"],
+body.nightmode input[type="text"] {
+    border: 1px solid var(--color-white);
+    color: var(--color-white);
+}
+
+@-webkit-keyframes autofill {
+    0%,100% {
+        background: transparent;
+    }
+}
+
+/*Setting up google.crhome autofill email */
+body.nightmode input:-webkit-autofill,
+body.nightmode input:-webkit-autofill:hover,
+body.nightmode input:-webkit-autofill:focus,
+body.nightmode input:-webkit-autofill:active {
+    -webkit-text-fill-color: var(--color-white);
+    transition: background-color 5000s ease-in-out 0s;
+}
+body input:-webkit-autofill,
+body input:-webkit-autofill:hover,
+body input:-webkit-autofill:focus,
+body input:-webkit-autofill:active {
+    -webkit-text-fill-color: var(--color-black);
+    transition: background-color 5000s ease-in-out 0s;
+}
+
+.line {
+    border: 1px solid var(--color-white);
+    height: 1px;
+    width: 80px;
+}
+
+.icon-eye {
+    cursor: pointer;
+    position: absolute;
+    right: 3%;
+    color: #6c757d;
+}
+
+.icon-eye::before {
+    content: "\e049";
 }
