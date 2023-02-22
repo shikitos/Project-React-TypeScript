@@ -103,8 +103,21 @@ body input:-webkit-autofill:active {
     position: absolute;
     right: 3%;
     color: #6c757d;
+    width: 13px;
+    height: 13px;
+    border: solid 1px #000;
+    border-radius:  75% 15%;
+    transform: rotate(45deg);
 }
 
 .icon-eye::before {
-    content: "\e049";
+    content: '';
+    display: block;
+    position: absolute;
+    width: 5px;
+    height: 5px;
+    border: solid 1px #000;
+    border-radius: 50%;
+    left: 3px;
+    top: 3px;
 }

@@ -1,14 +1,31 @@
-import React, {LegacyRef, useRef, useState} from 'react';
+import React, {LegacyRef, useEffect, useRef, useState} from 'react';
 import './Auth.css';
 
 type Props = {};
+type hasPasswordState = {
+	mainPassword: boolean;
+	newPassword: boolean;
+	confirmPassword: boolean;
+}
 
 const Auth:React.FC<Props> = (props) => {
-	const formRef = useRef() as LegacyRef<any>;
+	const formRef = useRef() as React.RefObject<HTMLFormElement>;
 	const passwordRef = useRef() as React.RefObject<HTMLInputElement>;
 	const newPasswordRef = useRef() as React.RefObject<HTMLInputElement>;
 	const confirmPasswordRef = useRef() as React.RefObject<HTMLInputElement>;
 	const [isRegistered, setIsRegistered] = useState<boolean>(true);
+	const [hasPassword, setHasPassword] = useState<hasPasswordState>({
+		mainPassword: false,
+		newPassword: false,
+		confirmPassword: false
+	});
+	const [passwordValidation, setPasswordValidation] = useState<boolean[]>([
+		false, // hasNumber
+		false, // hasSufficientLength
+		false, // hasBigChar
+		false // wasValidated
+	]);
+
 
 	const togglePasswordVisibility = (e: React.MouseEvent, refItem: React.RefObject<any>) => {
 		if (refItem.current) {
@@ -25,6 +42,14 @@ const Auth:React.FC<Props> = (props) => {
 		const email = target.email.value;
 		const password = target.password.value;
 		console.log(`Email: ${email}, password: ${password}`);
+		setPasswordValidation(previousState => [
+			/\d/.test(password),
+			password.length >= 8,
+			/[A-Z]/.test(password),
+			true
+		]);
+		const invalidValidations = passwordValidation.filter(elem => !elem);
+		if (invalidValidations.length) return false;
 	}
 
 	return (
@@ -51,9 +76,33 @@ const Auth:React.FC<Props> = (props) => {
 										Password
 									</label>
 									<div>
-										<input className="form__password" id="form__password" type="password" name="password" placeholder="Enter your password" ref={passwordRef}/>
-										<span className="icon-eye" onClick={(e) => togglePasswordVisibility(e, passwordRef)}></span>
+										<input
+											className="form__password"
+											id="form__password"
+											type="password"
+											name="password"
+											placeholder="Enter your password"
+											ref={passwordRef}
+											onChange={(e: React.ChangeEvent<HTMLInputElement>) => setHasPassword(prevState => ({ ...prevState, mainPassword: !!e.target.value }))}
+										/>
+										{
+											hasPassword.mainPassword &&
+											<span className="icon-eye"
+											      onClick={(e) => togglePasswordVisibility(e, passwordRef)}
+											>
+											</span>
+										}
 									</div>
+									{
+										(passwordValidation[3] && passwordValidation.some(value => !value)) &&
+										<p>
+											{`Your password must contain: 
+											${passwordValidation[0] ? "" :  `at least one number${(!passwordValidation[1] || !passwordValidation[2]) && ", "}` }
+											${passwordValidation[1] ? "" :  `length more than 8 symbols${!passwordValidation[2] ? ", " : "."}` }
+											${passwordValidation[2] ? "" :  "one UPPERCASE char." }
+											`}
+										</p>
+									}
 								</div>
 								<div className="auth-form__div">
 									<input className="form__submit" id="form__submit" type="submit" value="Sign In" />
@@ -87,8 +136,22 @@ const Auth:React.FC<Props> = (props) => {
 										Password
 									</label>
 									<div>
-										<input className="form__password" id="form__password" type="password" name="password" placeholder="Enter your password" ref ={newPasswordRef}/>
-										<span className="icon-eye" onClick={(e) => togglePasswordVisibility(e, newPasswordRef)}></span>
+										<input
+											className="form__password"
+									        id="form__password"
+									        type="password"
+									        name="password"
+									        placeholder="Enter your password"
+											ref ={newPasswordRef}
+											onChange={(e: React.ChangeEvent<HTMLInputElement>) => setHasPassword(prevState => ({ ...prevState, newPassword: !!e.target.value }))}
+										/>
+										{
+											hasPassword.newPassword &&
+											<span className="icon-eye"
+											      onClick={(e) => togglePasswordVisibility(e, newPasswordRef)}
+											>
+											</span>
+										}
 									</div>
 								</div>
 								<div className="auth-form__div">
@@ -96,8 +159,19 @@ const Auth:React.FC<Props> = (props) => {
 										Confirm Password
 									</label>
 									<div>
-										<input className="form__password" id="form__password" type="password" name="password" placeholder="Confirm your password" ref={confirmPasswordRef} />
-										<span className="icon-eye" onClick={(e) => togglePasswordVisibility(e, confirmPasswordRef)}></span>
+										<input
+											className="form__password"
+											id="form__password"
+											type="password"
+											name="password"
+											placeholder="Confirm your password"
+										    ref={confirmPasswordRef}
+											onChange={(e: React.ChangeEvent<HTMLInputElement>) => setHasPassword(prevState => ({ ...prevState, confirmPassword: !!e.target.value }))}
+										/>
+										{
+											hasPassword.confirmPassword &&
+											<span className="icon-eye" onClick={(e) => togglePasswordVisibility(e, confirmPasswordRef)}></span>
+										}
 									</div>
 								</div>
 								<div className="auth-form__div">
