@@ -105,7 +105,7 @@ body input:-webkit-autofill:active {
     color: #6c757d;
     width: 13px;
     height: 13px;
-    border: solid 1px #000;
+    border: solid 1px var(--color-white);
     border-radius:  75% 15%;
     transform: rotate(45deg);
 }
@@ -116,8 +116,26 @@ body input:-webkit-autofill:active {
     position: absolute;
     width: 5px;
     height: 5px;
-    border: solid 1px #000;
+    border: solid 1px var(--color-white);
     border-radius: 50%;
     left: 3px;
     top: 3px;
+}
+
+.icon-eye:hover,
+.icon-eye:hover::before {
+    border-color: #6c757d;
+}
+body.nightmode .icon-eye:hover,
+body.nightmode .icon-eye:hover::before {
+    border-color: #6c757d;
+}
+
+body span.icon-eye,
+body .icon-eye::before {
+    border-color: var(--color-black);
+}
+body.nightmode span.icon-eye,
+body.nightmode .icon-eye::before {
+    border-color: var(--color-white);
 }
