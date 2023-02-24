@@ -86,6 +86,10 @@
 	cursor: pointer;
 }
 
+.auth-form__status {
+	color: red;
+}
+
 /*.auth-form > form > div > input[type="submit"] {*/
 /*	border: 1px solid var(--color-black);*/
 /*	color: var(--color-black);*/

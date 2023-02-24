@@ -1,6 +1,8 @@
 import { request } from 'http';
 import React, {LegacyRef, useEffect, useRef, useState} from 'react';
 import './Auth.css';
+import { authInputsSignUp } from "../../utils/constants";
+import { AuthInput } from "../../components";
 
 type Props = {};
 type hasPasswordState = {
@@ -12,6 +14,13 @@ type requestStatusState = {
 	requestRequired: boolean;
 	signInData: object;
 	signUpData: object;
+}
+type PasswordValidation = {
+	hasNumber: boolean;
+	hasSufficientLength: boolean;
+	hasBigChar: boolean;
+	doesNotMatch: boolean;
+	wasValidated: boolean;
 }
 
 const Auth:React.FC<Props> = (props) => {
@@ -32,6 +41,20 @@ const Auth:React.FC<Props> = (props) => {
 		false, // doesn't match
 		false // wasValidated
 	]);
+	const [formValidation, setFormValidation] = useState<object>({
+		fullName: true,
+		username: true,
+		email: true,
+		password: true,
+		confirmPassword: true
+	});
+	const [passwordValidation, setPasswordValidation] = useState<PasswordValidation>({
+		hasNumber: true,
+		hasSufficientLength: true,
+		hasBigChar: true,
+		doesNotMatch: true,
+		wasValidated: true
+	});
 	const [reqStatus, setReqStatus] = useState<requestStatusState>({
 		requestRequired: false,
 		signInData: {},
@@ -64,16 +87,42 @@ const Auth:React.FC<Props> = (props) => {
 			const email = target.email.value;
 			const password = target.password.value;
 			const confirmPassword = target.confirmPassword.value;
-			if (password !== confirmPassword) {
-				setNewPasswordValidation(prev => [...prev.slice(0, 3), true]);
-				return false;
+			console.log(confirmPassword)
+			// if (password !== confirmPassword) {
+			// 	setNewPasswordValidation(prev => [...prev.slice(0, 3), true]);
+			// 	return false;
+			// }
+			setFormValidation(prev => ({
+				fullName: !!fullName,
+				username: !!username,
+				email: !!email,
+				password: !!password,
+				confirmPassword: !!confirmPassword
+			}));
+			console.log(formValidation)
+			for (let key in formValidation) {
+				const validation = formValidation[key as keyof typeof formValidation];
+				if (!validation) return false;
 			}
+
 			setNewPasswordValidation(previousState => [
 				/\d/.test(password),
 				password.length >= 8,
 				/[A-Z]/.test(password),
 				true
 			]);
+			setPasswordValidation(previousState => ({
+				...previousState,
+				hasNumber: /\d/.test(password),
+				hasSufficientLength: password.length >= 8,
+				hasBigChar: /[A-Z]/.test(password),
+				doesNotMatch: password !== confirmPassword,
+				wasValidated: true
+			}));
+			for (let key in passwordValidation) {
+				const validation = passwordValidation[key as keyof typeof passwordValidation];
+				if (!validation && key !== "wasValidated") return false;
+			}
 			const invalidValidations = newPasswordValidation.filter(elem => !elem);
 			if (invalidValidations.length) return false;
 			setReqStatus(prev => ({
@@ -106,12 +155,14 @@ const Auth:React.FC<Props> = (props) => {
 								ref={formRef}
 								onSubmit={(e) => handleSubmit(e, "signIn")}
 							>
-								<div className="auth-form__div">
-									<label htmlFor="form__login">
-										Email
-									</label>
-									<input className="form__login" id="form__login"  type="email" name="email" placeholder="Enter your email" />
-								</div>
+								<AuthInput
+									labelContent="Email"
+									inputClassName="form__login"
+									inputType="email"
+									inputName="email"
+									inputPlaceholder="Enter your email"
+									hasValue={false}
+								/>
 								<div className="auth-form__div">
 									<label htmlFor="form__password">
 										Password
@@ -136,8 +187,8 @@ const Auth:React.FC<Props> = (props) => {
 									</div>
 									{
 										!signInStatus &&
-										<p>
-											Your password or email is incorrect. Try again.
+										<p className="auth-form__status">
+											Password & Confirm Password does not match. Try again!
 										</p>
 									}
 								</div>
@@ -150,24 +201,21 @@ const Auth:React.FC<Props> = (props) => {
 								ref={formRef}
 								onSubmit={(e) => handleSubmit(e, "signUp")}
 							>
-								<div className="auth-form__div">
-									<label htmlFor="form__name">
-										Full Name
-									</label>
-									<input className="form__name" id="form__name"  type="text" name="fullName" placeholder="Enter your full name" />
-								</div>
-								<div className="auth-form__div">
-									<label htmlFor="form__login">
-										Username
-									</label>
-									<input className="form__username" id="form__username"  type="text" name="username" placeholder="Enter your username" />
-								</div>
-								<div className="auth-form__div">
-									<label htmlFor="form__login">
-										Email
-									</label>
-									<input className="form__login" id="form__login"  type="email" name="email" placeholder="Enter your email" />
-								</div>
+								{
+									authInputsSignUp.map((value, index) => (
+										<>
+											<AuthInput
+												key={index}
+												labelContent={value.labelContent}
+												inputClassName={value.inputClassName}
+												inputType={value.inputType}
+												inputName={value.inputName}
+												inputPlaceholder={value.inputPlaceholder}
+												hasValue={formValidation[value.inputName as keyof typeof formValidation]}
+											/>
+										</>
+									))
+								}
 								<div className="auth-form__div">
 									<label htmlFor="form__password">
 										Password
@@ -177,7 +225,7 @@ const Auth:React.FC<Props> = (props) => {
 											className="form__password"
 									        id="form__password"
 									        type="password"
-									        name="confirmPassword"
+									        name="password"
 									        placeholder="Enter your password"
 											ref ={newPasswordRef}
 											onChange={(e: React.ChangeEvent<HTMLInputElement>) => setHasPassword(prevState => ({ ...prevState, newPassword: !!e.target.value }))}
@@ -190,7 +238,18 @@ const Auth:React.FC<Props> = (props) => {
 											</span>
 										}
 									</div>
+									{
+										formValidation.password ?
+											'' :
+											<p
+												className="auth-form__status">
+												{
+													`Password is required`
+												}
+											</p>
+									}
 								</div>
+
 								<div className="auth-form__div">
 									<label htmlFor="form__password">
 										Confirm Password
@@ -200,7 +259,7 @@ const Auth:React.FC<Props> = (props) => {
 											className="form__password"
 											id="form__password"
 											type="password"
-											name="password"
+											name="confirmPassword"
 											placeholder="Confirm your password"
 										    ref={confirmPasswordRef}
 											onChange={(e: React.ChangeEvent<HTMLInputElement>) => setHasPassword(prevState => ({ ...prevState, confirmPassword: !!e.target.value }))}
@@ -211,11 +270,21 @@ const Auth:React.FC<Props> = (props) => {
 										}
 									</div>
 									{
+										formValidation.confirmPassword ?
+											'' :
+											<p
+												className="auth-form__status">
+												{
+													`Confirm Password is required.`
+												}
+											</p>
+									}
+									{
 										(newPasswordValidation[newPasswordValidation.length - 1] && newPasswordValidation.some(value => !value)) &&
-										<p>
+										<p className="auth-form__status">
 											{
 												newPasswordValidation[3] ?
-													'Your password wasn\'t  the same ' :
+													'Password & Confirm Password does not match. Try again!' :
 													`Your password must contain: 
 														${newPasswordValidation[0] ? "" :  `at least one number${(!newPasswordValidation[1] || !newPasswordValidation[2]) && ", "}` }
 														${newPasswordValidation[1] ? "" :  `length more than 8 symbols${!newPasswordValidation[2] ? ", " : "."}` }
