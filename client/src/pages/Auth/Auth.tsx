@@ -22,6 +22,13 @@ type PasswordValidation = {
 	doesNotMatch: boolean;
 	wasValidated: boolean;
 }
+type formValidation = {
+	fullName: boolean;
+	username: boolean;
+	email: boolean;
+	password: boolean;
+	confirmPassword: boolean;
+}
 
 const Auth:React.FC<Props> = (props) => {
 	const formRef = useRef() as React.RefObject<HTMLFormElement>;
@@ -41,12 +48,13 @@ const Auth:React.FC<Props> = (props) => {
 		false, // doesn't match
 		false // wasValidated
 	]);
-	const [formValidation, setFormValidation] = useState<object>({
+	const [formValidation, setFormValidation] = useState<formValidation>({
 		fullName: true,
 		username: true,
 		email: true,
 		password: true,
-		confirmPassword: true
+		confirmPassword: true,
+
 	});
 	const [passwordValidation, setPasswordValidation] = useState<PasswordValidation>({
 		hasNumber: true,
@@ -63,7 +71,12 @@ const Auth:React.FC<Props> = (props) => {
 	let signInStatus = true;
 
 	useEffect(() => {
-		console.log(reqStatus);
+		if (reqStatus.requestRequired) {
+			fetch('http://localhost:3000/api')
+				.then(response => response.text())
+				.then(data => console.log(data))
+				.finally(() => setReqStatus(prev => ({ ...prev, requestRequired: false})))
+		}
 	}, [reqStatus.requestRequired]);
 
 	const togglePasswordVisibility = (e: React.MouseEvent, refItem: React.RefObject<any>) => {
@@ -138,7 +151,15 @@ const Auth:React.FC<Props> = (props) => {
 		} else {
 			const email = target.email.value;
 			const password = target.password.value;
-
+			setReqStatus(prev => ({
+				...prev,
+				requestRequired: true,
+			}));
+		// 	setFormValidation(prev => ({
+		// 		...prev,
+		// 		email: !!email,
+		// 		password: !!password,
+		// 	}));
 		}
 	}
 
@@ -161,7 +182,7 @@ const Auth:React.FC<Props> = (props) => {
 									inputType="email"
 									inputName="email"
 									inputPlaceholder="Enter your email"
-									hasValue={false}
+									hasValue={true}
 								/>
 								<div className="auth-form__div">
 									<label htmlFor="form__password">
@@ -281,7 +302,7 @@ const Auth:React.FC<Props> = (props) => {
 									}
 									{
 										(newPasswordValidation[newPasswordValidation.length - 1] && newPasswordValidation.some(value => !value)) &&
-										<p className="auth-form__status">
+										<p className="auth-form__status password">
 											{
 												newPasswordValidation[3] ?
 													'Password & Confirm Password does not match. Try again!' :
