@@ -7,6 +7,8 @@ const cors = require('cors');
 app.use(cors());
 const apiRoutes = require('./routes/api.ts');
 
+app.use(express.json());
+
 // Mount API routes on /api path
 app.use('/api', apiRoutes);
 

@@ -3,6 +3,8 @@ import React, {LegacyRef, useEffect, useRef, useState} from 'react';
 import './Auth.css';
 import { authInputsSignUp } from "../../utils/constants";
 import { AuthInput } from "../../components";
+import { setStore } from "../../utils/storage";
+import {redirect, useNavigate} from "react-router-dom";
 
 type Props = {};
 type hasPasswordState = {
@@ -12,8 +14,16 @@ type hasPasswordState = {
 }
 type requestStatusState = {
 	requestRequired: boolean;
-	signInData: object;
-	signUpData: object;
+	signUpData: {
+		fullName?: string;
+		username?: string;
+		email?: string;
+		password?: string;
+	};
+	signInData: {
+		email?: string;
+		password?: string;
+	};
 }
 type PasswordValidation = {
 	hasNumber: boolean;
@@ -31,6 +41,7 @@ type formValidation = {
 }
 
 const Auth:React.FC<Props> = (props) => {
+	const navigate = useNavigate();
 	const formRef = useRef() as React.RefObject<HTMLFormElement>;
 	const passwordRef = useRef() as React.RefObject<HTMLInputElement>;
 	const newPasswordRef = useRef() as React.RefObject<HTMLInputElement>;
@@ -41,20 +52,13 @@ const Auth:React.FC<Props> = (props) => {
 		newPassword: false,
 		confirmPassword: false
 	});
-	const [newPasswordValidation, setNewPasswordValidation] = useState<boolean[]>([
-		false, // hasNumber
-		false, // hasSufficientLength
-		false, // hasBigChar
-		false, // doesn't match
-		false // wasValidated
-	]);
+
 	const [formValidation, setFormValidation] = useState<formValidation>({
 		fullName: true,
 		username: true,
 		email: true,
 		password: true,
 		confirmPassword: true,
-
 	});
 	const [passwordValidation, setPasswordValidation] = useState<PasswordValidation>({
 		hasNumber: true,
@@ -71,11 +75,75 @@ const Auth:React.FC<Props> = (props) => {
 	let signInStatus = true;
 
 	useEffect(() => {
-		if (reqStatus.requestRequired) {
-			fetch('http://localhost:3000/api')
-				.then(response => response.text())
-				.then(data => console.log(data))
-				.finally(() => setReqStatus(prev => ({ ...prev, requestRequired: false})))
+		const createUser = async (data: requestStatusState["signUpData"]) => {
+			console.log("Create new user: ", JSON.stringify(data))
+			const res = await fetch('http://localhost:5000/api/auth/signup', {
+				method: 'POST',
+				mode: 'cors',
+				'headers': {
+					'Content-type': 'application/json'
+				},
+				body: JSON.stringify(data)
+			});
+			const response = await res.text();
+			if (res.statusText === "Created") {
+				const parsedData = JSON.parse(response);
+				setStore('user', {
+					username: parsedData.username,
+					fullName: parsedData.fullName,
+					token: parsedData.token,
+					role: parsedData.role,
+					email: parsedData.email
+				});
+				console.log("Success!", parsedData);
+				navigate('/');
+			}
+		}
+
+		const signIn = async (data: requestStatusState["signInData"]) => {
+			console.log("Sign In: ", JSON.stringify(data))
+			setReqStatus(prev => ({ ...prev, requestRequired: false}));
+			const res = await fetch('http://localhost:5000/api/auth/signin', {
+				method: 'POST',
+				mode: 'cors',
+				'headers': {
+					'Content-type': 'application/json'
+				},
+				body: JSON.stringify(data)
+			});
+			const response = await res.text();
+			if (res.statusText === "OK") {
+				const parsedData = JSON.parse(response);
+				setStore('user', {
+					username: parsedData.username,
+					fullName: parsedData.fullName,
+					token: parsedData.token,
+					role: parsedData.role,
+					email: parsedData.email
+				});
+				console.log("Success!", parsedData);
+				navigate('/');
+			}
+		}
+
+
+		// console.log()
+		if (reqStatus.requestRequired && Object.keys(reqStatus.signInData).length !== 0) {
+			signIn(reqStatus.signInData)
+				.then(() => {
+					setReqStatus(prev => ({ ...prev, requestRequired: false}));
+				})
+				.catch(error => {
+					console.error(error);
+				});
+		} else if (reqStatus.requestRequired && Object.keys(reqStatus.signUpData).length !== 0) {
+			createUser(reqStatus.signUpData)
+				.then(() => {
+					setReqStatus(prev => ({ ...prev, requestRequired: false}));
+				})
+				.catch(error => {
+					console.error(error);
+				});
 		}
 	}, [reqStatus.requestRequired]);
 
@@ -87,6 +155,7 @@ const Auth:React.FC<Props> = (props) => {
 
 	const handleSubmit = (e: React.SyntheticEvent, typeOfSubmit: string) => {
 		e.preventDefault();
+		console.log(typeOfSubmit);
 		const target = e.target as typeof e.target & {
 			fullName: {value: string},
 			username: {value: string},
@@ -100,11 +169,6 @@ const Auth:React.FC<Props> = (props) => {
 			const email = target.email.value;
 			const password = target.password.value;
 			const confirmPassword = target.confirmPassword.value;
-			console.log(confirmPassword)
-			// if (password !== confirmPassword) {
-			// 	setNewPasswordValidation(prev => [...prev.slice(0, 3), true]);
-			// 	return false;
-			// }
 			setFormValidation(prev => ({
 				fullName: !!fullName,
 				username: !!username,
@@ -112,32 +176,23 @@ const Auth:React.FC<Props> = (props) => {
 				password: !!password,
 				confirmPassword: !!confirmPassword
 			}));
-			console.log(formValidation)
 			for (let key in formValidation) {
 				const validation = formValidation[key as keyof typeof formValidation];
 				if (!validation) return false;
 			}
-
-			setNewPasswordValidation(previousState => [
-				/\d/.test(password),
-				password.length >= 8,
-				/[A-Z]/.test(password),
-				true
-			]);
 			setPasswordValidation(previousState => ({
 				...previousState,
 				hasNumber: /\d/.test(password),
 				hasSufficientLength: password.length >= 8,
 				hasBigChar: /[A-Z]/.test(password),
-				doesNotMatch: password !== confirmPassword,
+				doesNotMatch: password === confirmPassword ,
 				wasValidated: true
 			}));
 			for (let key in passwordValidation) {
 				const validation = passwordValidation[key as keyof typeof passwordValidation];
+				if (!validation) console.log(password )
 				if (!validation && key !== "wasValidated") return false;
 			}
-			const invalidValidations = newPasswordValidation.filter(elem => !elem);
-			if (invalidValidations.length) return false;
 			setReqStatus(prev => ({
 				...prev,
 				requestRequired: true,
@@ -145,21 +200,25 @@ const Auth:React.FC<Props> = (props) => {
 					fullName: fullName,
 					username: username,
 					email: email,
-					password: password
+					password: password,
+					status: 'user'
 				}
 			}));
 		} else {
 			const email = target.email.value;
 			const password = target.password.value;
-			setReqStatus(prev => ({
-				...prev,
-				requestRequired: true,
-			}));
-		// 	setFormValidation(prev => ({
-		// 		...prev,
-		// 		email: !!email,
-		// 		password: !!password,
-		// 	}));
+			if (!!email && !!password) {
+				setReqStatus(prev => ({
+					...prev,
+					requestRequired: true,
+					signInData: {
+						email: email,
+						password: password
+					}
+				}));
+			} else {
+				return false;
+			}
 		}
 	}
 
@@ -168,7 +227,7 @@ const Auth:React.FC<Props> = (props) => {
 			<div className="container">
 				<div className="auth-form">
 					<h1>
-						{isRegistered ? "Sign Up" : "Sign In"}
+						{isRegistered ? "Sign In" : "Sign Up"}
 					</h1>
 					{
 						isRegistered ?
@@ -301,18 +360,18 @@ const Auth:React.FC<Props> = (props) => {
 											</p>
 									}
 									{
-										(newPasswordValidation[newPasswordValidation.length - 1] && newPasswordValidation.some(value => !value)) &&
-										<p className="auth-form__status password">
-											{
-												newPasswordValidation[3] ?
-													'Password & Confirm Password does not match. Try again!' :
-													`Your password must contain: 
-														${newPasswordValidation[0] ? "" :  `at least one number${(!newPasswordValidation[1] || !newPasswordValidation[2]) && ", "}` }
-														${newPasswordValidation[1] ? "" :  `length more than 8 symbols${!newPasswordValidation[2] ? ", " : "."}` }
-														${newPasswordValidation[2] ? "" :  "one UPPERCASE char." }
-													`
-											}
-										</p>
+										// (newPasswordValidation[newPasswordValidation.length - 1] && newPasswordValidation.some(value => !value)) &&
+										// <p className="auth-form__status password">
+										// 	{
+										// 		newPasswordValidation[3] ?
+										// 			'Password & Confirm Password does not match. Try again!' :
+										// 			`Your password must contain:
+										// 				${newPasswordValidation[0] ? "" :  `at least one number${(!newPasswordValidation[1] || !newPasswordValidation[2]) && ", "}` }
+										// 				${newPasswordValidation[1] ? "" :  `length more than 8 symbols${!newPasswordValidation[2] ? ", " : "."}` }
+										// 				${newPasswordValidation[2] ? "" :  "one UPPERCASE char." }
+										// 			`
+										// 	}
+										// </p>
 									}
 								</div>
 								<div className="auth-form__div">

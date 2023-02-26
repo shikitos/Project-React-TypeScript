@@ -1,9 +1,10 @@
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, redirect } from 'react-router-dom';
 import { ReactComponent as LogoSVG } from '../../utils/svg/logo.svg';
 import { ReactComponent as NightSVG } from '../../utils/svg/nightmode-night.svg';
 import { ReactComponent as DaySVG } from '../../utils/svg/nightmode-day.svg';
 import './Header.css';
 import React, {useEffect, useState} from "react";
+import {getStore, removeItem} from "../../utils/storage";
 
 
 type Props = {};
@@ -12,6 +13,7 @@ const Header = (props: Props) => {
     const navigate = useNavigate();
     const location = useLocation();
     const [nightmode, setNightMode] = useState<boolean>(true);
+    let storeData = getStore('user');
 
     useEffect(() => {
         if (nightmode) {
@@ -72,11 +74,30 @@ const Header = (props: Props) => {
                     </nav>
                 </div>
                 <div className='header-auth'>
-                    <button
-                        onClick={() => navigate('/sign-in')}
-                    >
-                        Sign In / Sign Up
-                    </button>
+                    {
+                        storeData ?
+                            location.pathname === '/profile' ?
+                                <button
+                                    onClick={() => {
+                                        removeItem('user');
+                                        navigate('/');
+                                        console.log(location.pathname)
+                                    }}
+                                >
+                                    Logout
+                                </button> :
+                                <button
+                                    onClick={() => navigate('/profile')}
+                                >
+                                    My Profile
+                                </button>
+                            :
+                            <button
+                                onClick={() => navigate('/sign-in')}
+                            >
+                                Sign In / Sign Up
+                            </button>
+                    }
                     <span
                         onClick={(event) => toggleNightMode(event)}
                         className={ nightmode ? 'nightmode' : 'daymode' }
