@@ -4,7 +4,7 @@ import './Auth.css';
 import { authInputsSignUp } from "../../utils/constants";
 import { AuthInput } from "../../components";
 import { setStore } from "../../utils/storage";
-import {redirect, useNavigate} from "react-router-dom";
+import { useNavigate} from "react-router-dom";
 
 type Props = {};
 type hasPasswordState = {
@@ -91,7 +91,6 @@ const Auth:React.FC<Props> = (props) => {
 				setStore('user', {
 					username: parsedData.username,
 					fullName: parsedData.fullName,
-					token: parsedData.token,
 					role: parsedData.role,
 					email: parsedData.email
 				});
@@ -109,20 +108,22 @@ const Auth:React.FC<Props> = (props) => {
 				'headers': {
 					'Content-type': 'application/json'
 				},
-				body: JSON.stringify(data)
+				body: JSON.stringify(data),
+				credentials: 'include', // send cookies with the request
 			});
 			const response = await res.text();
-			if (res.statusText === "OK") {
+			if (res.ok) {
 				const parsedData = JSON.parse(response);
 				setStore('user', {
 					username: parsedData.username,
 					fullName: parsedData.fullName,
-					token: parsedData.token,
 					role: parsedData.role,
 					email: parsedData.email
 				});
 				console.log("Success!", parsedData);
 				navigate('/');
+			}  else {
+				console.error(await res.text());
 			}
 		}
 

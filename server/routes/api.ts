@@ -26,16 +26,10 @@ router.post('/auth/signup', async (req, res) => {
 		// Save the user to the database
 		await user.save();
 		// Return success response
-		const payload = {
-			fullName: user.fullName,
-			username: user.username,
-			email: user.email,
-			role: user.role,
-		};
 
-		const token = jwt.sign(payload, secretKey, { expiresIn: '1d' });
+		const token = jwt.sign({ id: user.id }, secretKey, { expiresIn: '1d' });
+		res.cookie('token', token, { httpOnly: true, secure: true, sameSite: 'strict', maxAge: 24 * 60 * 60 * 1000, path: '/' });
 		res.status(201).send({
-			token,
 			username: user.username,
 			fullName: user.fullName,
 			email: user.email,
@@ -63,16 +57,9 @@ router.post('/auth/signin', async (req, res) => {
 		const isPasswordValid = await bcrypt.compare(userPassword, user.password);
 		if (!isPasswordValid) return res.status(404).send({ message: "Invalid login or password" });
 
-		const payload = {
-			fullName: user.fullName,
-			username: user.username,
-			email: user.email,
-			role: user.role,
-		};
-
-		const token = jwt.sign(payload, secretKey, { expiresIn: '1d' });
+		const token = jwt.sign({ id: user.id }, secretKey, { expiresIn: '1d' });
+		res.cookie('token', token, { httpOnly: true, secure: true, sameSite: 'strict', maxAge: 24 * 60 * 60 * 1000, path: '/' });
 		res.send({
-			token,
 			username: user.username,
 			fullName: user.fullName,
 			email: user.email,
