@@ -23,6 +23,21 @@ const userSchema = new Schema({
 		type: String,
 		enum: ['admin', 'moderator', 'user'],
 		default: 'user'
+	},
+	photo: {
+		type: String,
+	},
+	description: {
+		type: String,
+	},
+	city: {
+		type: String,
+	},
+	address: {
+		type: String,
+	},
+	favorites: {
+		type: Array,
 	}
 });
 

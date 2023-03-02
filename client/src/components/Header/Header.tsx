@@ -14,6 +14,7 @@ const Header = (props: Props) => {
     const location = useLocation();
     const [nightmode, setNightMode] = useState<boolean>(true);
     let storeData = getStore('user');
+    const [logout, setLogout] = useState<boolean>(false);
 
     useEffect(() => {
         if (nightmode) {
@@ -22,6 +23,24 @@ const Header = (props: Props) => {
             document.body.classList.remove('nightmode');
         }
     }, [nightmode]);
+
+    useEffect(() => {
+        const logoutReq = async() => {
+            const res = await fetch('http://localhost:5000/api/logout', {
+                method: 'POST',
+                credentials: 'include'
+            });
+            return await res.text();
+        }
+
+        if (logout && storeData.success) {
+            logoutReq()
+                .then(() => setLogout(prev => false))
+                .finally(() => removeItem('user'));
+        }
+
+
+    }, [logout, storeData]);
 
     const toggleNightMode = (event: React.MouseEvent) => {
         console.log(`Toggle to ${nightmode ? 'Day mode' : 'Night mode'}`);
@@ -75,13 +94,13 @@ const Header = (props: Props) => {
                 </div>
                 <div className='header-auth'>
                     {
-                        storeData ?
+                        storeData?.success ?
                             location.pathname === '/profile' ?
                                 <button
                                     onClick={() => {
-                                        removeItem('user');
+                                        setLogout(prev => true);
                                         navigate('/');
-                                        console.log(location.pathname)
+                                        console.log("Logged out!", location.pathname)
                                     }}
                                 >
                                     Logout

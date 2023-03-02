@@ -89,10 +89,12 @@ const Auth:React.FC<Props> = (props) => {
 			if (res.statusText === "Created") {
 				const parsedData = JSON.parse(response);
 				setStore('user', {
-					username: parsedData.username,
-					fullName: parsedData.fullName,
-					role: parsedData.role,
-					email: parsedData.email
+					success: parsedData.success,
+					username: parsedData.userData.username,
+					fullName: parsedData.userData.fullName,
+					role: parsedData.userData.role,
+					email: parsedData.userData.email,
+					id: parsedData.userData._id
 				});
 				console.log("Success!", parsedData);
 				navigate('/');
@@ -115,10 +117,12 @@ const Auth:React.FC<Props> = (props) => {
 			if (res.ok) {
 				const parsedData = JSON.parse(response);
 				setStore('user', {
-					username: parsedData.username,
-					fullName: parsedData.fullName,
-					role: parsedData.role,
-					email: parsedData.email
+					success: parsedData.success,
+					username: parsedData.userData.username,
+					fullName: parsedData.userData.fullName,
+					role: parsedData.userData.role,
+					email: parsedData.userData.email,
+					id: parsedData.userData._id
 				});
 				console.log("Success!", parsedData);
 				navigate('/');
