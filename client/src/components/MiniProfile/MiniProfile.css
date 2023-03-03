@@ -1,0 +1,33 @@
+.thumbnail {
+	display: flex;
+	align-items: center;
+}
+
+.thumbnail img {
+	width: 50px;
+	height: 50px;
+	border-radius: 25px;
+	cursor: pointer;
+}
+
+.thumbnail img:hover {
+	filter: grayscale(80%);
+}
+
+.miniprofile {
+	position: relative;
+}
+
+.miniprofile-list {
+	position: absolute;
+	height: 150px;
+	min-width: 150px;
+	width: auto;
+	background: var(--color-white);
+	display: none;
+	/*left: -75px;*/
+}
+
+.miniprofile-list.active {
+	display: flex;
+}

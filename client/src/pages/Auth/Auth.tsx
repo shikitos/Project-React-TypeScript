@@ -4,7 +4,7 @@ import './Auth.css';
 import { authInputsSignUp } from "../../utils/constants";
 import { AuthInput } from "../../components";
 import { setStore } from "../../utils/storage";
-import { useNavigate} from "react-router-dom";
+import {RouterProviderProps, useNavigate} from "react-router-dom";
 
 type Props = {};
 type hasPasswordState = {
@@ -86,7 +86,7 @@ const Auth:React.FC<Props> = (props) => {
 				body: JSON.stringify(data)
 			});
 			const response = await res.text();
-			if (res.statusText === "Created") {
+			if (res.ok) {
 				const parsedData = JSON.parse(response);
 				setStore('user', {
 					success: parsedData.success,
@@ -96,6 +96,11 @@ const Auth:React.FC<Props> = (props) => {
 					email: parsedData.userData.email,
 					id: parsedData.userData._id
 				});
+				caches.open('space-cache')
+					.then(cache => {
+						cache.put('avatar-image', parsedData.photo);
+				});
+				console.log("Add to cache",caches)
 				console.log("Success!", parsedData);
 				navigate('/');
 			}
@@ -118,14 +123,10 @@ const Auth:React.FC<Props> = (props) => {
 				const parsedData = JSON.parse(response);
 				setStore('user', {
 					success: parsedData.success,
-					username: parsedData.userData.username,
-					fullName: parsedData.userData.fullName,
-					role: parsedData.userData.role,
-					email: parsedData.userData.email,
-					id: parsedData.userData._id
+					id: parsedData.userData._id,
 				});
 				console.log("Success!", parsedData);
-				navigate('/');
+				navigate('/', { state: { userData: parsedData.userData }});
 			}  else {
 				console.error(await res.text());
 			}

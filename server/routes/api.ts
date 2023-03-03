@@ -78,7 +78,11 @@ router.post('/auth/signin', async (req, res) => {
 				_id: user.id,
 				username: user.username,
 				fullName: user.fullName,
-				email: user.email
+				email: user.email,
+				photo: user.photo,
+				city: user.city,
+				description: user.description,
+				address: user.address
 			}
 		});
 	} catch (error) {

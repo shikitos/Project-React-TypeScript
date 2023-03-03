@@ -5,6 +5,7 @@ import { ReactComponent as DaySVG } from '../../utils/svg/nightmode-day.svg';
 import './Header.css';
 import React, {useEffect, useState} from "react";
 import {getStore, removeItem} from "../../utils/storage";
+import { MiniProfile } from "../";
 
 
 type Props = {};
@@ -95,21 +96,23 @@ const Header = (props: Props) => {
                 <div className='header-auth'>
                     {
                         storeData?.success ?
-                            location.pathname === '/profile' ?
+                            <>
                                 <button
                                     onClick={() => {
                                         setLogout(prev => true);
                                         navigate('/');
                                         console.log("Logged out!", location.pathname)
                                     }}
-                                >
-                                    Logout
-                                </button> :
+                                >Logout</button>
+                                <MiniProfile
+                                    image={location.state?.userData?.photo}
+                                />
                                 <button
-                                    onClick={() => navigate('/profile')}
-                                >
-                                    My Profile
-                                </button>
+                                    onClick={() => {
+                                        navigate('/profile', { state: {userData: location.state.userData}});
+                                    }}
+                                >Profile</button>
+                            </>
                             :
                             <button
                                 onClick={() => navigate('/sign-in')}

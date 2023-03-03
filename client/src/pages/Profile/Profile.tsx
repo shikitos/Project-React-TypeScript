@@ -1,5 +1,6 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {getStore} from "../../utils/storage";
+import {useLocation} from "react-router-dom";
 
 
 type Props = {}
@@ -20,6 +21,8 @@ const Profile: React.FC<Props> = () => {
 	const cityRef = useRef<HTMLInputElement>(null);
 	const addressRef = useRef<HTMLInputElement>(null);
 	let storedData = getStore('user');
+	const location = useLocation();
+	console.log(location);
 
 	const handleSubmit = (e: React.SyntheticEvent) => {
 		e.preventDefault();
@@ -53,7 +56,7 @@ const Profile: React.FC<Props> = () => {
 		}
 	}, [readyToSubmit]);
 
-	useEffect(() => {
+	/*useEffect(() => {
 		const getUserData = async () => {
 			const res = await fetch(`http://localhost:5000/api/user/`, {
 				method: 'GET',
@@ -65,7 +68,7 @@ const Profile: React.FC<Props> = () => {
 		getUserData()
 			.then((data) => {setUserData(prev => data.user)})
 			.catch((error) => console.error(error));
-	},[]);
+	},[]);*/
 
 	useEffect(() => {
 		return () => {
@@ -95,25 +98,25 @@ const Profile: React.FC<Props> = () => {
 	return (
 		<div className="profile">
 			<div className="container">
-				<h1>Hello, {userData?.fullName}!</h1>
+				<h1>Hello, {location.state?.userData?.fullName}!</h1>
 				<div>
-					<form onSubmit={handleSubmit}>
+					<form onSubmit={handleSubmit} className='profile-form'>
 						<div className="profile-inputblock">
+							{base64Image || location.state?.userData.photo && <img src={`data:image/png;base64,${location.state?.userData?.photo ? location.state?.userData.photo : base64Image}`} alt="Uploaded file" />}
 							<label>Photo</label>
 							<input type="file" accept="image/jpeg, image/png, image/jpg" onChange={handleFileInputChange} />
-							{base64Image || userData.photo && <img src={`data:image/png;base64,${userData.photo ? userData.photo : base64Image}`} alt="Uploaded file" />}
 						</div>
 						<div className="profile-inputblock">
 							<label>Description</label>
-							<input type="text" ref={descriptionRef} defaultValue={userData.description} />
+							<input type="text" ref={descriptionRef} defaultValue={location.state?.userData?.description} />
 						</div>
 						<div className="profile-inputblock">
 							<label>City</label>
-							<input type="text" ref={cityRef} defaultValue={userData.city}/>
+							<input type="text" ref={cityRef} defaultValue={location.state?.userData?.city}/>
 						</div>
 						<div className="profile-inputblock">
 							<label htmlFor="">Address</label>
-							<input type="text" ref={addressRef} defaultValue={userData.address}/>
+							<input type="text" ref={addressRef} defaultValue={location.state?.userData?.address}/>
 						</div>
 						<input type="submit" />
 					</form>
