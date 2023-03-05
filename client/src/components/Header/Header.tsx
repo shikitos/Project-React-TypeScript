@@ -15,7 +15,7 @@ const Header = (props: Props) => {
     const location = useLocation();
     const [nightmode, setNightMode] = useState<boolean>(true);
     let storeData = getStore('user');
-    const [logout, setLogout] = useState<boolean>(false);
+    console.log(storeData);
 
     useEffect(() => {
         if (nightmode) {
@@ -24,24 +24,6 @@ const Header = (props: Props) => {
             document.body.classList.remove('nightmode');
         }
     }, [nightmode]);
-
-    useEffect(() => {
-        const logoutReq = async() => {
-            const res = await fetch('http://localhost:5000/api/logout', {
-                method: 'POST',
-                credentials: 'include'
-            });
-            return await res.text();
-        }
-
-        if (logout && storeData.success) {
-            logoutReq()
-                .then(() => setLogout(prev => false))
-                .finally(() => removeItem('user'));
-        }
-
-
-    }, [logout, storeData]);
 
     const toggleNightMode = (event: React.MouseEvent) => {
         console.log(`Toggle to ${nightmode ? 'Day mode' : 'Night mode'}`);
@@ -60,32 +42,32 @@ const Header = (props: Props) => {
             <div className='container'>
                 <div className='header-logo'>
                     <LogoSVG 
-                        onClick={() => navigate('/')}
+                        onClick={() => navigate('/', { state: { userData: location.state.userData }})}
                     />
                 </div>
                 <div className='header-nav'>
                     <nav>
                         <ul>
                             <li 
-                                onClick={() => navigate('/')}
+                                onClick={() => navigate('/', { state: { userData: location.state.userData }})}
                                 className={`header-nav__li active`}
                             >
                                 Home
                             </li>
                             <li 
-                                onClick={() => navigate('/tours')}
+                                onClick={() => navigate('/tours', { state: { userData: location.state.userData }})}
                                 className={`header-nav__li`}
                             >
                                 Tours
                             </li>
                             <li 
-                                onClick={() => navigate('/shop')}
+                                onClick={() => navigate('/shop', { state: { userData: location.state.userData }})}
                                 className={`header-nav__li`}
                             >
                                 Shop
                             </li>
                             <li 
-                                onClick={() => navigate('/support')}
+                                onClick={() => navigate('/support', { state: { userData: location.state.userData }})}
                                 className={`header-nav__li`}
                             >
                                 Support
@@ -95,23 +77,11 @@ const Header = (props: Props) => {
                 </div>
                 <div className='header-auth'>
                     {
-                        storeData?.success ?
+                        storeData?.success && storeData ?
                             <>
-                                <button
-                                    onClick={() => {
-                                        setLogout(prev => true);
-                                        navigate('/');
-                                        console.log("Logged out!", location.pathname)
-                                    }}
-                                >Logout</button>
                                 <MiniProfile
                                     image={location.state?.userData?.photo}
                                 />
-                                <button
-                                    onClick={() => {
-                                        navigate('/profile', { state: {userData: location.state.userData}});
-                                    }}
-                                >Profile</button>
                             </>
                             :
                             <button

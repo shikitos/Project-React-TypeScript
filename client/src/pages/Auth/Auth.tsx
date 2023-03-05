@@ -6,6 +6,7 @@ import { AuthInput } from "../../components";
 import { setStore } from "../../utils/storage";
 import {RouterProviderProps, useNavigate} from "react-router-dom";
 
+
 type Props = {};
 type hasPasswordState = {
 	mainPassword: boolean;
@@ -95,10 +96,6 @@ const Auth:React.FC<Props> = (props) => {
 					role: parsedData.userData.role,
 					email: parsedData.userData.email,
 					id: parsedData.userData._id
-				});
-				caches.open('space-cache')
-					.then(cache => {
-						cache.put('avatar-image', parsedData.photo);
 				});
 				console.log("Add to cache",caches)
 				console.log("Success!", parsedData);

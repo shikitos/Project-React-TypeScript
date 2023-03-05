@@ -124,15 +124,23 @@ router.patch('/users/update', authenticateToken, async (req, res) => {
 });
 
 router.get('/user/', authenticateToken, async (req, res) => {
+	const includePhoto = req.query.photo === 'true'; // check for string "true"
 	console.log("Get User Data");
 	try {
-		const user = await User.findOne({ _id: req.userID}).select('-password');
+		let query = User.findOne({ _id: req.userID }).select({password: 0});
+		if (!includePhoto) {
+			console.log("Without Photo...")
+			query = query.select({photo: 0});
+		}
+		const user = await query.exec();
 		res.send({ user });
 	} catch (error) {
 		console.error(error);
 		res.status(500).send({ message: 'Server error' });
 	}
 });
+
+
 
 router.post('/logout', authenticateToken, async (req, res) => {
 	try {

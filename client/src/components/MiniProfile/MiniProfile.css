@@ -21,13 +21,39 @@
 .miniprofile-list {
 	position: absolute;
 	height: 150px;
-	min-width: 150px;
+	min-width: 50px;
 	width: auto;
 	background: var(--color-white);
 	display: none;
+	color: var(--color-white);
+	margin-top: 5px;
+	background: transparent
+
 	/*left: -75px;*/
 }
 
 .miniprofile-list.active {
 	display: flex;
+	align-items: center;
+	height: auto;
+}
+
+.miniprofile-list > ul {
+	width: 100%;
+}
+
+.miniprofile-list> ul > li {
+	list-style: none;
+	cursor: pointer;
+	padding: 0 15px;
+	border: 1px solid var(--color-white);
+}
+
+.miniprofile-list> ul > li:not(:last-child) {
+	border-bottom: none;
+}
+
+.miniprofile-list> ul > li:hover {
+	color: var(--color-black);
+	background: var(--color-white);
 }
