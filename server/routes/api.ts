@@ -4,6 +4,7 @@ const {Router} = require('express');
 const router = Router();
 const bcrypt = require('bcrypt');
 const User = require('../models/user.ts');
+const nodemailer = require('nodemailer');
 const jwt = require('jsonwebtoken');
 const secretKey = 'yourSecretKey';
 import { serialize } from 'cookie';
@@ -152,6 +153,42 @@ router.post('/logout', authenticateToken, async (req, res) => {
 		res.status(500).send({ message: 'Server error' });
 	}
 });
+
+router.post('/email', async (req, res) => {
+	try {
+		const userData = {
+			name: req.body.name,
+			email: req.body.email,
+			message: req.body.message
+		}
+
+		const transporter = nodemailer.createTransport({
+			service: 'gmail',
+			auth: {
+				user: process.env.MAIL_NAME,
+				pass: process.env.MAIL_PASSWORD
+			}
+		});
+
+		const mailOptions = {
+			from: process.env.MAIL_NAME,
+			to: process.env.MAIL_NAME,
+			subject: userData.name,
+			text: userData.message
+		};
+
+		transporter.sendMail(mailOptions, function(error, info){
+			if (error) {
+				throw new Error(error);
+			} else {
+				console.log('Email sent: ' + info.response);
+				res.status(200).send('Email sent: ' + info.response);
+			}
+		});
+	} catch (error) {
+		res.status(error.status).send({ message: 'Error sending email', error: error.message });
+	}
+})
 
 // Export router instance
 module.exports = router;

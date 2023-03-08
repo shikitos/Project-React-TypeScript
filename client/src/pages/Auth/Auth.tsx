@@ -387,9 +387,9 @@ const Auth:React.FC<Props> = (props) => {
 							<div className="line"></div><span>OR</span><div className="line"></div>
 						</div>
 						<p>
-							{isRegistered ? "Already have an account? " : "New here? "}
+							{isRegistered ? "New here? " : "Already have an account? "}
 							<span onClick={() => setIsRegistered(prev => !prev)}>
-								{isRegistered ? "Sign In" : "Sign Up"}
+								{isRegistered ? "Sign Up" : "Sign In" }
 							</span>
 						</p>
 					</div>

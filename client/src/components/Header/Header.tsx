@@ -7,7 +7,6 @@ import React, {useEffect, useState} from "react";
 import {getStore, removeItem} from "../../utils/storage";
 import { MiniProfile } from "../";
 
-
 type Props = {};
 
 const Header = (props: Props) => {
@@ -42,32 +41,32 @@ const Header = (props: Props) => {
             <div className='container'>
                 <div className='header-logo'>
                     <LogoSVG 
-                        onClick={() => navigate('/', { state: { userData: location.state.userData }})}
+                        onClick={() => navigate('/', storeData ? storeData ? { state: { userData: location.state.userData }} : {} : {})}
                     />
                 </div>
                 <div className='header-nav'>
                     <nav>
                         <ul>
                             <li 
-                                onClick={() => navigate('/', { state: { userData: location.state.userData }})}
+                                onClick={() => navigate('/', storeData ? { state: { userData: location.state.userData }} : {})}
                                 className={`header-nav__li active`}
                             >
                                 Home
                             </li>
                             <li 
-                                onClick={() => navigate('/tours', { state: { userData: location.state.userData }})}
+                                onClick={() => navigate('/tours', storeData ? { state: { userData: location.state.userData }} : {})}
                                 className={`header-nav__li`}
                             >
                                 Tours
                             </li>
                             <li 
-                                onClick={() => navigate('/shop', { state: { userData: location.state.userData }})}
+                                onClick={() => navigate('/shop', storeData ? { state: { userData: location.state.userData }} : {})}
                                 className={`header-nav__li`}
                             >
                                 Shop
                             </li>
                             <li 
-                                onClick={() => navigate('/support', { state: { userData: location.state.userData }})}
+                                onClick={() => navigate('/support', storeData ? { state: { userData: location.state.userData }} : {})}
                                 className={`header-nav__li`}
                             >
                                 Support

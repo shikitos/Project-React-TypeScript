@@ -139,3 +139,11 @@ body.nightmode span.icon-eye,
 body.nightmode .icon-eye::before {
     border-color: var(--color-white);
 }
+
+body textarea {
+    color: var(--color-black);
+}
+
+body.nightmode textarea {
+    color: var(--color-white);
+}

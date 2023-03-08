@@ -1,0 +1,25 @@
+.support {
+	margin: 25px 0;
+}
+
+.support > .container {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+
+.support-form > form {
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+}
+
+.support-form__input {
+	display: flex;
+	flex-direction: column;
+}
+
+.support-form__input > textarea {
+	resize: none;
+}
