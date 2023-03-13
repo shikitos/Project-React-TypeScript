@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 interface FetchState<T> {
 	data?: T;
 	error?: Error;
-	isLoading: boolean;
+	status?: number;
 }
 
 interface FetchOptions {
@@ -15,7 +15,8 @@ interface FetchOptions {
 
 function useFetch<T>(url: string, options: FetchOptions = {}): FetchState<T> {
 	const [state, setState] = useState<FetchState<T>>({
-		isLoading: true,
+		data: undefined,
+		status: undefined
 	});
 
 	useEffect(() => {
@@ -31,14 +32,14 @@ function useFetch<T>(url: string, options: FetchOptions = {}): FetchState<T> {
 					console.error(`HTTP error! Status: ${response.status}`);
 				} else {
 					const data = await response.json();
-					setState({ isLoading: false, data });
+					setState(prev => ({ data: data, status: response.status }));
 				}
 			} catch (error: unknown) {
 				console.error(error);
-				setState({ isLoading: false, error: error as Error });
+				setState({ error: error as Error });
 			}
 		};
-		fetchData();
+		fetchData().then(r => state);
 	}, [url, options]);
 
 	return state;

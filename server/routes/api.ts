@@ -110,6 +110,10 @@ const authenticateToken = (req, res, next) => {
 	});
 }
 
+router.get('/isauthenticated', authenticateToken, (req, res) => {
+	res.status(200).send( { message: 'Authenticated' })
+})
+
 
 router.patch('/users/update', authenticateToken, async (req, res) => {
 	console.log("Update user data", req.userID);
@@ -154,6 +158,7 @@ router.post('/logout', authenticateToken, async (req, res) => {
 	}
 });
 
+// TODO: This does not work properly
 router.post('/email', async (req, res) => {
 	try {
 		const userData = {
@@ -163,17 +168,22 @@ router.post('/email', async (req, res) => {
 		}
 
 		const transporter = nodemailer.createTransport({
-			service: 'gmail',
+			host: "127.0.0.1",
+			port: 5001,
+			secure: false,
 			auth: {
 				user: process.env.MAIL_NAME,
 				pass: process.env.MAIL_PASSWORD
+			},
+			tls: {
+				"rejectUnauthorized": false
 			}
 		});
 
 		const mailOptions = {
 			from: process.env.MAIL_NAME,
 			to: process.env.MAIL_NAME,
-			subject: userData.name,
+			subject: `Message from: ${userData.email}. Name ${userData.name}`,
 			text: userData.message
 		};
 
